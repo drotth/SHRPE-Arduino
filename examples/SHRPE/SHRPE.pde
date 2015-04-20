@@ -4,11 +4,12 @@ Shrpe shrpe();
 
 void setup()
 {
+  shrpe.logIn();
 }
 
 void loop()
 {
-  shrpe.logIn();
+  shrpe.sendData();
   delay(3000);
 }
 
