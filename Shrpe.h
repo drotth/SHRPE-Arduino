@@ -16,7 +16,7 @@ class Shrpe
   public:
     Shrpe();
     void logIn();
-	void sendData();
+	void uploadObject();
 	void logOut();
 };
 

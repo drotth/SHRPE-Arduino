@@ -19,7 +19,7 @@ void Shrpe::logIn()
   //do something 
 }
 
-void Shrpe::sendData()
+void Shrpe::uploadObject()
 {
   //do something 
 }
