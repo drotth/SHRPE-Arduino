@@ -6,9 +6,11 @@ volatile uint8_t incoming = 0;
 void setup()
 {
   Serial.begin(115200);
-  attachInterrupt(1, irq_handler, RISING);
+  pinMode(2, INPUT);
   pinMode(13, OUTPUT);
   digitalWrite(13, LOW);
+  digitalWrite(2, LOW);
+  attachInterrupt(0, irq_handler, RISING);
   delay(7000); // fot the shield to boot up
 }
 
@@ -27,14 +29,14 @@ void loop()
 }
 
 void irq_handler(){
-  incoming = Serial.read();
-  if (incoming = 8){
-    Serial.write(20);
+//  incoming = Serial.read();
+//  if (incoming = 8){
+//    Serial.write(20);
     digitalWrite(13, HIGH);
-  } else{
-    Serial.write(30);
-  }
-  incoming = 0;
+//  } else{
+//    Serial.write(30);
+//  }
+//  incoming = 0;
   //digitalWrite(13, LOW);
 }
 
