@@ -2,6 +2,7 @@
 
 //Shrpe shrpe();
 volatile uint8_t incoming = 0;
+volatile uint8_t dataRecieved = 0;
 
 void setup()
 {
@@ -9,8 +10,8 @@ void setup()
   pinMode(2, INPUT);
   pinMode(13, OUTPUT);
   digitalWrite(13, LOW);
-  digitalWrite(2, LOW);
-  attachInterrupt(0, irq_handler, RISING);
+  digitalWrite(2, HIGH);
+  attachInterrupt(0, irq_handler, FALLING);
   delay(7000); // fot the shield to boot up
 }
 
@@ -24,20 +25,21 @@ void loop()
   //Serial.write(array,10);
   Serial.write(9);
   
+//  if (incoming == 1){
+//    dataRecieved = Serial.read();
+//    incoming = 0;
+//  }
+  
+  Serial.write(dataRecieved);
+  
   delay(10000); //wait then loop
   
 }
 
 void irq_handler(){
-//  incoming = Serial.read();
-//  if (incoming = 8){
-//    Serial.write(20);
-    digitalWrite(13, HIGH);
-//  } else{
-//    Serial.write(30);
-//  }
-//  incoming = 0;
-  //digitalWrite(13, LOW);
+  incoming = 1;
+  digitalWrite(13, !digitalRead(13));
+  dataRecieved = Serial.read();
 }
 
 
