@@ -1,4 +1,4 @@
 Shrpe	KEYWORD1
-logIn	KEYWORD2
-sendData	KEYWORD2
-logOut	KEYWORD2
+begin	KEYWORD2
+uploadObject	KEYWORD2
+getData	KEYWORD2

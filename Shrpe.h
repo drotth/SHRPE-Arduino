@@ -15,9 +15,12 @@ class Shrpe
 {
   public:
     Shrpe();
-    void logIn();
-	void uploadObject();
-	void logOut();
+	void begin();
+	void uploadObject(uint8_t data_byte);
+	void uploadObject(uint8_t array[], uint8_t size);
+	uint8_t getData();
+  private:
+    uint8_t dataRecieved;
 };
 
 #endif
