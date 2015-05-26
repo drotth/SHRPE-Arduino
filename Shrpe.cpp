@@ -12,9 +12,10 @@
 #include "packet_framing_library\Framing.cpp"
 #include "packet_framing_library\Timer.cpp"
 
-static void shrpe_irq_handler();
+void shrpe_irq_handler();
 
-volatile uint8_t dataRecieved = 0;
+volatile boolean flag = false;
+
 Framing framing;
 
 Shrpe::Shrpe()
@@ -47,13 +48,18 @@ void Shrpe::uploadObject(uint8_t array[], uint8_t size)
   framing.sendFramedData(array, size);
 }
 
-uint8_t Shrpe::getData()
+uint8_t Shrpe::getData(void)
 {
-   return dataRecieved;
+   if (flag){
+	   flag = false;
+	   digitalWrite(13, !digitalRead(13));
+	   return 1;
+   } else {
+	   return 0;
+   }
 }
 
-static void shrpe_irq_handler(){
-  digitalWrite(13, !digitalRead(13));
-  dataRecieved = Serial.read();
+void shrpe_irq_handler(){
+	flag = true;
 }
 

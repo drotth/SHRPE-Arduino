@@ -90,7 +90,7 @@ void Framing::sendFramedData(byte* data, int length) {
   framed_data[buf_index]=m_ETX;
   buf_index++;
   
-  Serial.write(buf_index); //notify shield the amount of incoming bytes
+  //Serial.write(buf_index); //notify shield the amount of incoming bytes
   Serial.write(framed_data, buf_index);
 }
 
