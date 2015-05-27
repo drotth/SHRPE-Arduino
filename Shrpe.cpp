@@ -25,6 +25,7 @@ Shrpe::Shrpe()
 
 void Shrpe::begin()
 {
+  delay(6000); // wait for the shield to boot up
   Serial.begin(115200);
   framing.setTimout(0.1);
   pinMode(2, INPUT);
@@ -32,7 +33,6 @@ void Shrpe::begin()
   digitalWrite(13, LOW);
   digitalWrite(2, HIGH);
   attachInterrupt(0, shrpe_irq_handler, FALLING);
-  delay(6000); // wait for the shield to boot up
 }
 
 void Shrpe::uploadObject(uint8_t data_byte)
@@ -43,7 +43,7 @@ void Shrpe::uploadObject(uint8_t data_byte)
 
 void Shrpe::uploadObject(uint8_t array[], uint8_t size)
 {
-  Serial.write(19); //dummy to notice shield we're about to send
+  //Serial.write(19); //dummy to notice shield we're about to send
   delay(10);
   framing.sendFramedData(array, size);
 }
@@ -61,5 +61,9 @@ uint8_t Shrpe::getData(void)
 
 void shrpe_irq_handler(){
 	flag = true;
+	char incoming = Serial.read();
+	//if (incoming == 255) 
+		digitalWrite(13, !digitalRead(13));
+	Serial.println(incoming);
 }
 
