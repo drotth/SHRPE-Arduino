@@ -27,6 +27,11 @@ void Shrpe::begin()
 {
   delay(6000); // wait for the shield to boot up
   Serial.begin(115200);
+/*   byte dummyBuffer[Serial.available()];
+  if (Serial.available() > 0){
+	  byte dummyBuffer[Serial.available()];
+	  Serial.readBytes(dummyBuffer, Serial.available());
+  } */
   framing.setTimout(0.1);
   pinMode(2, INPUT);
   pinMode(13, OUTPUT);
@@ -61,9 +66,15 @@ uint8_t Shrpe::getData(void)
 
 void shrpe_irq_handler(){
 	flag = true;
-	char incoming = Serial.read();
-	//if (incoming == 255) 
+	char buffer[Serial.available()];
+	if (Serial.available() > 0){
+		Serial.readBytes(buffer, Serial.available());
+		//char incoming = Serial.read();
+		//if (incoming == 255) 
 		digitalWrite(13, !digitalRead(13));
-	Serial.println(incoming);
+		Serial.print("I recieved: ");
+		//Serial.println(incoming);
+		Serial.println(buffer); 
+	}
 }
 
