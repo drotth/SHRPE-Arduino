@@ -66,15 +66,25 @@ uint8_t Shrpe::getData(void)
 
 void shrpe_irq_handler(){
 	flag = true;
-	char buffer[Serial.available()];
-	if (Serial.available() > 0){
-		Serial.readBytes(buffer, Serial.available());
+	//digitalWrite(13, !digitalRead(13));
+	int bytes_available = Serial.available();
+	//Serial.print("Bytes available: ");
+    //Serial.println(bytes_available, DEC);
+	
+	if (bytes_available){
+		//char buffer[bytes_available +1];
+		//memset(buffer, 0, sizeof(buffer));
+		//Serial.readBytes(buffer, bytes_available);
 		//char incoming = Serial.read();
-		//if (incoming == 255) 
-		digitalWrite(13, !digitalRead(13));
-		Serial.print("I recieved: ");
+		//Serial.print("Recieved: ");
 		//Serial.println(incoming);
-		Serial.println(buffer); 
+		//Serial.println(buffer);
+		
+		uint8_t buffer[bytes_available];
+		Serial.readBytes(buffer, bytes_available);
+		if (buffer[0] == 55){
+			digitalWrite(13, !digitalRead(13));
+		}
 	}
 }
 
