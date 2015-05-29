@@ -47,24 +47,28 @@ void Shrpe::write(uint8_t array[], uint8_t size)
   framing.sendFramedData(array, size);
 }
 
-bool Shrpe::available()
+byte Shrpe::downloadObject(uint8_t* buffer_ptr, uint8_t size)
 {
-	return dataAvailable;
-}
-
-void shrpe_irq_handler()
-{
-  digitalWrite(13, !digitalRead(13)); // toggle LED to indicate IRQ trigger
   int bytes_available = Serial.available();
 		
     if (bytes_available)
 	{
 	  framing.receiveFramedData(input_buff, input_length, crc_valid);
-	  for(int i = 0; i < input_length; i++)
-	  {
-		Serial.print(input_buff[i],DEC);
-		Serial.print(" ");
-	  }
-	Serial.println();
+	  buffer_ptr = &input_buff[0];
+	  
+	  return input_length;
 	}
+	
+  dataAvailable = false;
+}
+
+bool Shrpe::available()
+{
+  return dataAvailable;
+}
+
+void shrpe_irq_handler()
+{
+  digitalWrite(13, !digitalRead(13)); // toggle LED to indicate IRQ trigger
+  dataAvailable = true;
 }

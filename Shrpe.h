@@ -31,6 +31,10 @@ class Shrpe
 	*/
 	void write(uint8_t array[], uint8_t size);
 	/*
+	  kjdsflkjdslfjdsfkdsjfljdslfTEMPTEMPTEMp
+	*/
+	byte downloadObject(uint8_t* buffer_ptr, uint8_t size);
+	/*
 	  Returns true if the shield has available data, otherwise false.
 	*/
 	bool available();
