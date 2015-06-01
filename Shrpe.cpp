@@ -7,9 +7,9 @@
 
 #include "Shrpe.h"
 #include "Arduino.h"
-#include "packet_framing_library\CRC_16.cpp"
-#include "packet_framing_library\Framing.cpp"
-#include "packet_framing_library\Timer.cpp"
+#include "packet_framing_library/CRC_16.cpp"
+#include "packet_framing_library/Framing.cpp"
+#include "packet_framing_library/Timer.cpp"
 
 void shrpe_irq_handler();
 
