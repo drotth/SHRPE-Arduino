@@ -30,25 +30,18 @@ void loop()
                      31, 32, 33, 34, 35, 36, 37, 38, 39, 40
                     };
 
-  //shrpe.write(array, sizeof(array));
+  shrpe.write(array, sizeof(array));
 
-//  while (!shrpe.available());
-//  uint8_t incoming_data[40];
-//  int len;
-//  len = shrpe.downloadObject(incoming_data, 40);
-  
-  //Serial.println(incoming_data[0], DEC);
+  while (!shrpe.available());
+  uint8_t incoming_data[40];
+  int len;
+  len = shrpe.downloadObject(incoming_data, 40);
 
-//  for (int i = 0; i < len; i++)
-//  {
-//    Serial.print(incoming_data[i], DEC);
-//    Serial.print(" ");
-//  }
-//  Serial.println();
-
-//  if (incoming_data[0] == 7){
-//    Serial.println("GREAT SUCCESS");
-//  }
+  Serial.println(" ");
+  for (int i = 0; i < len; i++) {
+    Serial.print(incoming_data[i], DEC);
+    Serial.print(" ");
+  }
 
   delay(10000);
 }
