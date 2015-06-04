@@ -29,9 +29,11 @@ void Shrpe::begin()
   delay(6000); // wait for the shield to boot up
   Serial.begin(115200);
   framing.setTimout(0.1);
-  pinMode(2, INPUT); //
-  pinMode(13, OUTPUT);
+  pinMode(2, INPUT); // IRQ-PIN
+  pinMode(13, OUTPUT); // LED-PIN
+  pinMode(12, OUTPUT); // "AVAILABLE"-PIN
   digitalWrite(13, LOW);
+  digitalWrite(12, LOW);
   digitalWrite(2, HIGH); // turn on pull-up resistor
   attachInterrupt(0, shrpe_irq_handler, FALLING);
 }
@@ -56,6 +58,12 @@ byte Shrpe::downloadObject(uint8_t* buffer_ptr, uint8_t size)
 	  framing.receiveFramedData(input_buff, input_length, crc_valid);
 	  buffer_ptr = &input_buff[0];
 	  
+	  Serial.println(" ");
+	  for (int i = 0; i < input_length; i++){
+		  Serial.print(input_buff[i], DEC);
+		  Serial.print(" ");
+	  }
+	  
 	  return input_length;
 	}
 	
@@ -64,11 +72,29 @@ byte Shrpe::downloadObject(uint8_t* buffer_ptr, uint8_t size)
 
 bool Shrpe::available()
 {
+	// if (digitalRead(12) == HIGH){
+		// return true;
+	// }
+	// else return false;
   return dataAvailable;
 }
 
 void shrpe_irq_handler()
 {
+  //dataAvailable = true;
+  //digitalWrite(12, HIGH);
   digitalWrite(13, !digitalRead(13)); // toggle LED to indicate IRQ trigger
-  dataAvailable = true;
+
+  int bytes_available = Serial.available();
+    if (bytes_available)
+	{
+	  framing.receiveFramedData(input_buff, input_length, crc_valid);
+	  
+	  Serial.println(" ");
+	  for (int i = 0; i < input_length; i++){
+		  Serial.print(input_buff[i], DEC);
+		  // Serial.println(Serial.read(), DEC);
+		  Serial.print(" ");
+	  }
+	}
 }

@@ -12,6 +12,8 @@
 
 class Shrpe
 {
+  private:
+	volatile bool dataAvailable;
   public:
 	/*
 	  Constructor för a Shrpe object.
@@ -37,7 +39,7 @@ class Shrpe
 	/*
 	  Returns true if the shield has available data, otherwise false.
 	*/
-	bool available();
+	boolean available();
 };
 
 #endif

@@ -30,12 +30,12 @@ void loop()
                      31, 32, 33, 34, 35, 36, 37, 38, 39, 40
                     };
 
-  shrpe.write(array, sizeof(array));
+  //shrpe.write(array, sizeof(array));
 
-  while (!shrpe.available());
-  uint8_t incoming_data[40];
-  int len;
-  len = shrpe.downloadObject(incoming_data, 40);
+//  while (!shrpe.available());
+//  uint8_t incoming_data[40];
+//  int len;
+//  len = shrpe.downloadObject(incoming_data, 40);
   
   //Serial.println(incoming_data[0], DEC);
 
@@ -50,5 +50,5 @@ void loop()
 //    Serial.println("GREAT SUCCESS");
 //  }
 
-  delay(3000);
+  delay(10000);
 }
