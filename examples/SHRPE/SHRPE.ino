@@ -32,16 +32,17 @@ void loop()
 
   shrpe.write(array, sizeof(array));
 
-  while (!shrpe.available());
-  uint8_t incoming_data[40];
-  int len;
-  len = shrpe.downloadObject(incoming_data, 40);
+  if (shrpe.available()) {
+    uint8_t incoming_data[40];
+    int len;
+    len = shrpe.downloadObject(incoming_data, 40);
 
-  Serial.println(" ");
-  for (int i = 0; i < len; i++) {
-    Serial.print(incoming_data[i], DEC);
-    Serial.print(" ");
+    shrpe.write(incoming_data, len);
+
+    if (incoming_data[37] == 38){
+      digitalWrite(13, !digitalRead(13));
+    }
   }
 
-  delay(10000);
+  delay(1000);
 }
