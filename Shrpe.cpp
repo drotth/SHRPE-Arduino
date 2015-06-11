@@ -18,6 +18,7 @@ volatile bool dataAvailable = false;
 Framing framing;
 byte input_buff[100];
 int input_length, crc_valid;
+int timeout_counter = 5000;
 
 Shrpe::Shrpe()
 {
@@ -60,7 +61,9 @@ byte Shrpe::downloadObject(uint8_t* buffer_ptr, uint8_t size)
   uint8_t data_array[1] = {MSG_GET_NEXT_DATA};
   framing.sendFramedData(data_array, 1);
   
-  while(!Serial.available());
+  while(!Serial.available() && timeout_counter > 0) {
+	  timeout_counter--;
+  };
   
   framing.receiveFramedData(input_buff, input_length, crc_valid);
   
