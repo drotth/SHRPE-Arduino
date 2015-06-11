@@ -17,6 +17,8 @@
 
 Shrpe shrpe;
 uint8_t counter = 0;
+boolean ul_obj = false;
+boolean dl_obj = false;
 
 void setup()
 {
@@ -32,24 +34,13 @@ void loop()
                     };
 
   if (counter % 5 == 0) {
-    //shrpe.write(array, sizeof(array));
+    shrpe.write(array, sizeof(array));
   }
-
   if (shrpe.available()) {
     uint8_t incoming_data[38];
     int len;
     len = shrpe.downloadObject(incoming_data, 38);
-//    for (int i = 0; i < len; i++) {
-//      Serial.print(incoming_data[i]);
-//      Serial.print(" ");
-//    }
-//    Serial.println("");
-//    Serial.println("");
-//    Serial.println(len);
-//    delay(1000);
     shrpe.write(incoming_data, len);
-  } else {
-//    Serial.println("Nothing available");
   }
   counter++;
   delay(1000);
