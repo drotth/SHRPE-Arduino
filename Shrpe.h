@@ -36,16 +36,21 @@ class Shrpe
 	/*
 	  Writes an array of (unsigned) bytes to the SHRPE Shield.
 	  The function is capable of sending between 1-40 bytes.
+	  @param	array	the data to be sent.
+	  @param	size	size of the array.
 	*/
 	void write(uint8_t array[], uint8_t size);
 	/*
 	  Receives an array of (unsigned) bytes from the SHRPE Shield.
 	  The function is capable of receiving up to 38 bytes.
 	  Returns the numbers of bytes in the array.
+	  @param	buffer_ptr	pointer to where to store the data.
+	  @param	size		size of the array.
+	  @return				the length of the array.
 	*/
-	byte downloadObject(uint8_t* buffer_ptr, uint8_t size);
+	byte read(uint8_t* buffer_ptr, uint8_t size);
 	/*
-	  Returns true if the shield has data available, otherwise false.
+	  @Return	true if the shield has data available, otherwise false.
 	*/
 	boolean available();
 };

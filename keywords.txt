@@ -1,3 +1,4 @@
 Shrpe	KEYWORD1
 begin	KEYWORD2
 write	KEYWORD2
+read	KEYWORD2

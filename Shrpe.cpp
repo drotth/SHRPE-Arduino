@@ -41,15 +41,12 @@ void Shrpe::begin()
 
 void Shrpe::write(uint8_t data_byte)
 {
-  delay(25); //to avoid collision
   uint8_t data_array[1] = {data_byte};
   write(data_array, 1);
-  delay(25); //to avoid collision
 }
 
 void Shrpe::write(uint8_t array[], uint8_t size)
 {
-  delay(25); //to avoid collision
   uint8_t msg_array[size+1];
   msg_array[0] = MSG_UPLOAD_OBJ;
   for (int i = 0; i < size; i++){
@@ -57,13 +54,11 @@ void Shrpe::write(uint8_t array[], uint8_t size)
   }
   framing.sendFramedData(msg_array, size+1);
   delay(7); //to send max 88bytes
-  delay(25); //to avoid collision
 }
 
-byte Shrpe::downloadObject(uint8_t* buffer_ptr, uint8_t size)
+byte Shrpe::read(uint8_t* buffer_ptr, uint8_t size)
 {
   uint8_t data_array[1] = {MSG_GET_NEXT_DATA};
-  delay(25); //to avoid collision
   framing.sendFramedData(data_array, 1);
   
   while(!Serial.available() && timeout_counter > 0) {
@@ -75,7 +70,6 @@ byte Shrpe::downloadObject(uint8_t* buffer_ptr, uint8_t size)
   for (int i = 0; i < input_length; i++){
 	buffer_ptr[i] = input_buff[i];
   }
-  delay(25); //to avoid collision
   return input_length;
 }
 

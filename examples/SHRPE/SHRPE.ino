@@ -1,15 +1,17 @@
 /*
   Looping Write with SHRPE
 
-  A simple example of how to use the 'write' functionality
+  A simple example of how to use the 'write' and 'read' functionality
   with the SHRPE library. The program loops forever,
-  continuously sending an array of 40 bytes, every third second.
+  continuously sending an array of 40 bytes, every 5th second.
+  If there is data available (sent from the gateway), it will read 
+  the data and send it back.
 
   Notice the shrpe.begin() call in the setup function.
   This function is necessary for the Shrpe object to function
   properly.
 
-  Created 28 May 2015
+  Created 10 June 2015
   By Andreas Drotth & Soded Alatia
 */
 
@@ -39,7 +41,7 @@ void loop()
   if (shrpe.available()) {
     uint8_t incoming_data[38];
     int len;
-    len = shrpe.downloadObject(incoming_data, 38);
+    len = shrpe.read(incoming_data, 38);
     shrpe.write(incoming_data, len);
   }
   counter++;
