@@ -16,8 +16,10 @@
 */
 
 #include <Shrpe.h>
+#include <SoftwareSerial.h>
 
 Shrpe shrpe;
+SoftwareSerial mySerial(10, 11); // RX, TX
 uint8_t counter = 0;
 boolean ul_obj = false;
 boolean dl_obj = false;
@@ -25,6 +27,7 @@ boolean dl_obj = false;
 void setup()
 {
   shrpe.begin();
+  mySerial.begin(115200);
 }
 
 void loop()
@@ -36,12 +39,32 @@ void loop()
                     };
 
   if (counter % 5 == 0) {
-    shrpe.write(array, sizeof(array));
+    int result = shrpe.write(array, sizeof(array));
+    int result2 = shrpe.write(array, sizeof(array));
+    mySerial.println("Uploading object: 40 bytes");
+    mySerial.print("write result: ");
+    mySerial.println(result);
+    mySerial.print("write the second result: ");
+    mySerial.println(result2);
+    if(result2 == 1) {
+      delay(100);
+      mySerial.println("waiting 100ms before i send again...");
+      result2 = shrpe.write(array, sizeof(array));
+      mySerial.print("writing the result of the second retry: ");
+      mySerial.println(result2);
+      mySerial.println();
+    } else {
+      result = shrpe.write(array, sizeof(array));
+      mySerial.println("It was OK to send again");
+    }
+
   }
   if (shrpe.available()) {
     uint8_t incoming_data[38];
     int len;
     len = shrpe.read(incoming_data, 38);
+    mySerial.print("downloading object of length: ");
+    mySerial.println(len);
     shrpe.write(incoming_data, len);
   }
   counter++;
