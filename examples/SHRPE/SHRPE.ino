@@ -23,6 +23,7 @@ SoftwareSerial mySerial(10, 11); // RX, TX
 uint8_t counter = 0;
 boolean ul_obj = false;
 boolean dl_obj = false;
+int result = 0;
 
 void setup()
 {
@@ -39,23 +40,24 @@ void loop()
                     };
 
   if (counter % 5 == 0) {
-    int result = shrpe.write(array, sizeof(array));
-    int result2 = shrpe.write(array, sizeof(array));
-    mySerial.println("Uploading object: 40 bytes");
-    mySerial.print("write result: ");
+    mySerial.println("\nUploading 2 objects: 40 bytes");
+    result = shrpe.write(array, sizeof(array));
+    mySerial.print("write result of first object: ");
     mySerial.println(result);
-    mySerial.print("write the second result: ");
-    mySerial.println(result2);
-    if(result2 == 1) {
+    result = shrpe.write(array, sizeof(array));
+    mySerial.print("write result of second object: ");
+    mySerial.println(result);
+    if(result == 1) {
       delay(100);
       mySerial.println("waiting 100ms before i send again...");
-      result2 = shrpe.write(array, sizeof(array));
+      result = shrpe.write(array, sizeof(array));
       mySerial.print("writing the result of the second retry: ");
-      mySerial.println(result2);
-      mySerial.println();
+      mySerial.println(result);
     } else {
       result = shrpe.write(array, sizeof(array));
       mySerial.println("It was OK to send again");
+      mySerial.print("Result of last write: ");
+      mySerial.println(result);
     }
 
   }
@@ -65,7 +67,7 @@ void loop()
     len = shrpe.read(incoming_data, 38);
     mySerial.print("downloading object of length: ");
     mySerial.println(len);
-    shrpe.write(incoming_data, len);
+    //shrpe.write(incoming_data, len);
   }
   counter++;
   delay(1000);

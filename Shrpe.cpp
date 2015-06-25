@@ -18,7 +18,7 @@ volatile bool dataAvailable = false;
 Framing framing;
 byte input_buff[100];
 int input_length, crc_valid, msg_handled = 0;
-int timeout_counter = 5000;
+int timeout_counter = 15000;
 
 Shrpe::Shrpe()
 {
@@ -45,7 +45,7 @@ void Shrpe::write(uint8_t data_byte)
   write(data_array, 1);
 }
 
-byte Shrpe::write(uint8_t array[], uint8_t size)
+int Shrpe::write(uint8_t array[], uint8_t size)
 {
   uint8_t msg_array[size+1];
   msg_array[0] = MSG_UPLOAD_OBJ;
@@ -58,9 +58,8 @@ byte Shrpe::write(uint8_t array[], uint8_t size)
   while(!Serial.available() && timeout_counter > 0) {
 	  timeout_counter--;
   };
-  
   framing.receiveFramedData(input_buff, input_length, crc_valid);
-  return input_buff[0];
+  return input_buff[0]; 
 }
 
 byte Shrpe::read(uint8_t* buffer_ptr, uint8_t size)

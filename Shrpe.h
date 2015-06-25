@@ -39,7 +39,7 @@ class Shrpe
 	  @param	array	the data to be sent.
 	  @param	size	size of the array.
 	*/
-	byte write(uint8_t array[], uint8_t size);
+	int write(uint8_t array[], uint8_t size);
 	/*
 	  Receives an array of (unsigned) bytes from the SHRPE Shield.
 	  The function is capable of receiving up to 38 bytes.
