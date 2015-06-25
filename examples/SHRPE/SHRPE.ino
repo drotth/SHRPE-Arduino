@@ -44,7 +44,16 @@ void loop()
     result = shrpe.write(array, sizeof(array));
     mySerial.print("write result of first object: ");
     mySerial.println(result);
-    result = shrpe.write(array, sizeof(array));
+    while(!shrpe.available());
+    uint8_t event_ack[2];
+    int len = shrpe.read(event_ack, 2);
+    mySerial.print("Length of event_ack: ");
+    mySerial.println(len);
+    mySerial.print("MSG TYPE: ");
+    mySerial.println(event_ack[0]);
+    mySerial.print("ACK RESULT: ");
+    mySerial.println(event_ack[1]);
+    /*result = shrpe.write(array, sizeof(array));
     mySerial.print("write result of second object: ");
     mySerial.println(result);
     if(result == 1) {
@@ -59,6 +68,7 @@ void loop()
       mySerial.print("Result of last write: ");
       mySerial.println(result);
     }
+    */
 
   }
   if (shrpe.available()) {
