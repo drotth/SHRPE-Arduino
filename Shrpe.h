@@ -48,7 +48,7 @@ class Shrpe
 	  @param	size		size of the array.
 	  @return				the length of the array.
 	*/
-	byte read(uint8_t* buffer_ptr, uint8_t size);
+	int read(uint8_t* buffer_ptr, uint8_t size);
 	/*
 	  @Return	true if the shield has data available, otherwise false.
 	*/

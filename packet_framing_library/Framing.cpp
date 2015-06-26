@@ -37,7 +37,7 @@ void Framing::setTimout(double timeout) {
 }
 
 //Public method for framing data
-void Framing::sendFramedData(byte* data, int length) {
+bool Framing::sendFramedData(byte* data, int length) {
   int buf_index=0;
   byte framed_data[100];
   
@@ -91,7 +91,7 @@ void Framing::sendFramedData(byte* data, int length) {
   buf_index++;
   
   //Serial.write(buf_index); //notify shield the amount of incoming bytes
-  Serial.write(framed_data, buf_index);
+  return (buf_index == Serial.write(framed_data, buf_index));
 }
 
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)

@@ -53,30 +53,41 @@ int Shrpe::write(uint8_t array[], uint8_t size)
 		msg_array[i+1] = array[i];
   }
   framing.sendFramedData(msg_array, size+1);
-  delay(7); //to send max 88bytes
+  //delay(7); //to send max 88bytes
   
-  while(!Serial.available() && timeout_counter > 0) {
-	  timeout_counter--;
-  };
   framing.receiveFramedData(input_buff, input_length, crc_valid);
-  return input_buff[0]; 
+  if (crc_valid == 1)  {
+	  
+    return input_buff[0];
+  }
+  return -1;
+  
+  //timeout_counter = 30000;
+  //while(!Serial.available() && timeout_counter--);
+  //if(timeout_counter == 0) {
+	//  return -1;
+  //} else {
+	//  framing.receiveFramedData(input_buff, input_length, crc_valid);
+	//  return input_buff[0];
+  //
+  //}
 }
 
-byte Shrpe::read(uint8_t* buffer_ptr, uint8_t size)
+int Shrpe::read(uint8_t* buffer_ptr, uint8_t size)
 {
   uint8_t data_array[1] = {MSG_GET_NEXT_DATA};
-  framing.sendFramedData(data_array, 1);
+  if (framing.sendFramedData(data_array, 1)) {
   
-  while(!Serial.available() && timeout_counter > 0) {
-	  timeout_counter--;
-  };
-  
-  framing.receiveFramedData(input_buff, input_length, crc_valid);
-  
-  for (int i = 0; i < input_length; i++){
-	buffer_ptr[i] = input_buff[i];
+    framing.receiveFramedData(input_buff, input_length, crc_valid);
+    if(crc_valid == 1) {
+	  for (int i = 0; i < input_length; i++){
+	    buffer_ptr[i] = input_buff[i];
+	  }
+	  return input_length;  
+    }
+	return 0;
   }
-  return input_length;
+  return -1;
 }
 
 bool Shrpe::available()
