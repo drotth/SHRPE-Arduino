@@ -3,9 +3,9 @@
 
   A simple example of how to use the 'write' and 'read' functionality
   with the SHRPE library. The program loops forever,
-  continuously sending an array of 40 bytes, every 5th second.
-  If there is data available (sent from the gateway), it will read 
-  the data.
+  continuously sending an array of 40 bytes, every 5th second 
+  and waiting for a response message (ACK/NACK).
+  If there is data available, it will read the data.
 
   Notice the shrpe.begin() call in the setup function.
   This function is necessary for the Shrpe object to function
@@ -35,17 +35,14 @@ void loop()
                     };
 
   if (counter % 5 == 0) {
-    //uploading an object of 40 bytes.
-    //Result == 0 if sent correctly, -1 otherwise.
     result = shrpe.write(array, sizeof(array));
     //wait for ACK/NACK response from Radio.
     while(!shrpe.available());		
     uint8_t event_ack[2];		
-    //len == length of the bytes written in event_ack
-    //MSG_TYPE: event_ack[0]    (upload_object_msg==1)
-    //ACK RESULT: event_ack[1]  (0 if OK, 1 if CRC wrong, -1 if error)
+    //MSG_TYPE: event_ack[0]
+    //ACK RESULT: event_ack[1]  (0 if OK, 1 if NACK)
     int len = shrpe.read(event_ack, 2);
-    if(event_ack[0] == MSG_UPLOAD_OBJ) {
+    if(event_ack[0] == MSG_UPLOAD_OBJECT) {
       int ack = event_ack[1];
     } else {
       //error.. it wasn't an upload_object msg

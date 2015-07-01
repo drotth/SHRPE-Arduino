@@ -3,6 +3,7 @@
   - Library for usage together with the SHRPE shield.
   Authors: Andreas Drotth & Soded Alatia, 
   Created: May 28, 2015.
+  Last Modified: July 1, 2015.
 */
 
 #include "Shrpe.h"
@@ -22,7 +23,7 @@ int timeout_counter = 15000;
 
 Shrpe::Shrpe()
 {
-	
+	//empty constructor.
 }
 
 void Shrpe::begin()
@@ -31,18 +32,16 @@ void Shrpe::begin()
   Serial.begin(115200);
   framing.setTimout(0.1);
   pinMode(2, INPUT); // IRQ-PIN
-  pinMode(13, OUTPUT); // LED-PIN
   pinMode(12, OUTPUT); // "DATA AVAILABLE"-PIN
-  digitalWrite(13, LOW);
   digitalWrite(12, LOW);
   digitalWrite(2, HIGH); // turn on pull-up resistor
   attachInterrupt(0, shrpe_irq_handler, FALLING);
 }
 
-void Shrpe::write(uint8_t data_byte)
+int Shrpe::write(uint8_t data_byte)
 {
   uint8_t data_array[1] = {data_byte};
-  write(data_array, 1);
+  return write(data_array, 1);
 }
 
 int Shrpe::write(uint8_t array[], uint8_t size)
@@ -53,7 +52,6 @@ int Shrpe::write(uint8_t array[], uint8_t size)
 		msg_array[i+1] = array[i];
   }
   framing.sendFramedData(msg_array, size+1);
-  //delay(7); //to send max 88bytes
   
   framing.receiveFramedData(input_buff, input_length, crc_valid);
   if (crc_valid == 1)  {
@@ -61,16 +59,6 @@ int Shrpe::write(uint8_t array[], uint8_t size)
     return input_buff[0];
   }
   return -1;
-  
-  //timeout_counter = 30000;
-  //while(!Serial.available() && timeout_counter--);
-  //if(timeout_counter == 0) {
-	//  return -1;
-  //} else {
-	//  framing.receiveFramedData(input_buff, input_length, crc_valid);
-	//  return input_buff[0];
-  //
-  //}
 }
 
 int Shrpe::read(uint8_t* buffer_ptr, uint8_t size)
