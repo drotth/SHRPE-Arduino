@@ -3,15 +3,15 @@
 
   A simple example of how to use the 'write' and 'read' functionality
   with the SHRPE library. The program loops forever,
-  continuously sending an array of 40 bytes, every 5th second.
-  If there is data available (sent from the gateway), it will read 
-  the data and send it back.
+  continuously sending an array of 40 bytes, every 5th second 
+  and waiting for a response message (ACK/NACK).
+  If there is data available, it will read the data.
 
   Notice the shrpe.begin() call in the setup function.
   This function is necessary for the Shrpe object to function
   properly.
 
-  Created 10 June 2015
+  Created 1 July 2015
   By Andreas Drotth & Soded Alatia
 */
 
@@ -19,8 +19,7 @@
 
 Shrpe shrpe;
 uint8_t counter = 0;
-boolean ul_obj = false;
-boolean dl_obj = false;
+int result = 0;
 
 void setup()
 {
@@ -36,13 +35,25 @@ void loop()
                     };
 
   if (counter % 5 == 0) {
-    shrpe.write(array, sizeof(array));
+    result = shrpe.write(array, sizeof(array));
+    //wait for ACK/NACK response from Radio.
+    while(!shrpe.available());		
+    uint8_t event_ack[2];		
+    //MSG_TYPE: event_ack[0]
+    //ACK RESULT: event_ack[1]  (0 if OK, 1 if NACK)
+    int len = shrpe.read(event_ack, 2);
+    if(event_ack[0] == MSG_UPLOAD_OBJECT) {
+      int ack = event_ack[1];
+    } else {
+      //error.. it wasn't an upload_object msg
+    }
   }
+  
   if (shrpe.available()) {
     uint8_t incoming_data[38];
     int len;
+    //len == length of incoming_data
     len = shrpe.read(incoming_data, 38);
-    shrpe.write(incoming_data, len);
   }
   counter++;
   delay(1000);
