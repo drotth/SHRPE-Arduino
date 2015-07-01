@@ -10,11 +10,11 @@
 
 #include "Arduino.h"
 
-#define MSG_RES_OK			0x00
-#define MSG_UPLOAD_OBJ		0x01
-#define MSG_UPLOAD_ACK		0x02
-#define MSG_UPLOAD_NACK		0x03
-#define MSG_GET_NEXT_DATA	0x04
+#define MSG_RES_OK				0x00
+#define MSG_RES_NOT_OK			0x01
+#define MSG_UPLOAD_OBJECT		0x02
+#define MSG_GET_NEXT_DATA		0x03
+#define MSG_DOWNLOAD_OBJECT		0x04
 
 class Shrpe
 {

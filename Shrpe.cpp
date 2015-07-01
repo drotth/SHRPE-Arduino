@@ -48,7 +48,7 @@ void Shrpe::write(uint8_t data_byte)
 int Shrpe::write(uint8_t array[], uint8_t size)
 {
   uint8_t msg_array[size+1];
-  msg_array[0] = MSG_UPLOAD_OBJ;
+  msg_array[0] = MSG_UPLOAD_OBJECT;
   for (int i = 0; i < size; i++){
 		msg_array[i+1] = array[i];
   }
