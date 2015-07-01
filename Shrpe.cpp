@@ -4,6 +4,7 @@
   Authors: Andreas Drotth & Soded Alatia, 
   Created: May 28, 2015.
   Last Modified: July 1, 2015.
+  Release version: v2.0
 */
 
 #include "Shrpe.h"
