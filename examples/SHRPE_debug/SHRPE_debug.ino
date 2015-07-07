@@ -27,6 +27,7 @@ void setup()
 {
   shrpe.begin();
   mySerial.begin(115200);
+  mySerial.println("\nStarting arduino shrpe program");
 }
 
 void loop()
@@ -37,7 +38,7 @@ void loop()
                      31, 32, 33, 34, 35, 36, 37, 38, 39, 40
                     };
 
-  if (counter % 5 == 0) {
+  if (++counter % 5 == 0) {
     mySerial.println("\nUploading 1 object: 40 bytes");
     result = shrpe.write(array, sizeof(array));		
     mySerial.print("write result of first object: ");		
@@ -76,6 +77,5 @@ void loop()
     mySerial.print("downloading object of length: ");
     mySerial.println(len);
   }
-  counter++;
   delay(1000);
 }
