@@ -35,7 +35,7 @@ void Shrpe::begin()
   framing.setTimout(0.1);
   pinMode(2, INPUT); // IRQ-PIN
   digitalWrite(2, HIGH); // turn on pull-up resistor
-  attachInterrupt(0, shrpe_irq_handler, FALLING);
+  //attachInterrupt(0, shrpe_irq_handler, FALLING);
 }
 
 int Shrpe::write(uint8_t data_byte)
@@ -80,6 +80,14 @@ int Shrpe::read(uint8_t* buffer_ptr, uint8_t size)
 
 bool Shrpe::available()
 {
+  if (!digitalRead(2)){
+	return true;
+  }
+  else return false;
+}
+/*
+bool Shrpe::available()
+{
   if (dataAvailable2 == 1){
 	dataAvailable2 = 0;
 	return true;
@@ -91,3 +99,4 @@ void shrpe_irq_handler()
 {
   dataAvailable2 = 1;
 }
+*/
