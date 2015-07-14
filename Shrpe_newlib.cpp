@@ -116,9 +116,8 @@ int Shrpe::receiveUploadObjectAck()
   // for now assume that an ack is received
   //buffer[0] = 1; // 1 => ack is received, 0 => tx failed, no ack received
   //buffer[1] = 0; // ack payload if ack received OR error code if tx failed
-  result = upl_obj_ack_buff[0];
-	upl_obj_ack_buff[0] = 64;
-  return result;
+  //result = upl_obj_ack_buff[0];
+  return upl_obj_ack_buff[0];
 }
 
 int Shrpe::receiveDownloadObject(uint8_t *buffer, size_t length)

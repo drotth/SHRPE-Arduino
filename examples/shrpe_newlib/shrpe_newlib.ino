@@ -25,9 +25,7 @@ void loop() {
   //let shield lib execute
   shrpe.loop();
 
-  //check shield state
-  //currentState = shrpe.getState();
-  //if (currentState == SHRPE_STATE_CONNECTED) {
+  if (currentState == SHRPE_STATE_CONNECTED) {
     int ack_res;
     if (isSending) {
       ack_res = shrpe.receiveUploadObjectAck();
@@ -48,9 +46,11 @@ void loop() {
         }
       }
     }
-//  } else {
-//    mySerial.println("not connected :(");
-//    mySerial.println(currentState);
-//  }
+  } else {
+      //check shield state
+      currentState = shrpe.getState();
+      mySerial.print("currentState: ");
+      mySerial.println(currentState);
+  }
   delay(1000);
 }
