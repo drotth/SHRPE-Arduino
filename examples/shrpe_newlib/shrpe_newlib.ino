@@ -10,7 +10,7 @@ bool isSending = false;
 uint8_t upl_obj[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                      11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
                      21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-                     31, 32, 33, 34, 35, 36, 37, 38, 39, 40
+                     31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41
                     };
 uint8_t receiveBuffer[38];
 
@@ -43,7 +43,7 @@ void loop() {
         result = shrpe.sendUploadObject(upl_obj, sizeof(upl_obj));
         mySerial.print("Sent upload object with result: ");
         mySerial.println(result);
-        if (result == sizeof(upl_obj)) {
+        if (result == sizeof(upl_obj) || result == 40) {
           isSending = true;
         }
       }

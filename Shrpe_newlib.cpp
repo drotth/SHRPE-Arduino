@@ -23,7 +23,7 @@
 #include "packet_framing_library/Timer.cpp"
 
 Framing framing;
-byte input_buff[100], upl_obj_ack_buff[1], dl_obj_buff[39];
+byte input_buff[100], upl_obj_ack_buff[1], dl_obj_buff[38];
 int input_length, crc_valid, result;
 size_t dl_obj_len;
 
@@ -64,7 +64,7 @@ void Shrpe::loop()
 				upl_obj_ack_buff[0] = msg[1];
         break;
       case SHRPE_DOWNLOAD_OBJECT:
-				for(int i = 0; i < length; i++) {
+				for(int i = 0; i < length-1; i++) {
 					dl_obj_buff[i] = msg[i+1];
 				}
 				dl_obj_len = length-1;
