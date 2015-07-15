@@ -64,7 +64,7 @@ private:
      *
      * return: shrpe_result if it was successful/error
      */
-		shrpe_result_t getNextMessage(uint8_t* msg, size_t length);
+		shrpe_result_t getNextMessage(int* msg, size_t* length);
 		
 public:
     Shrpe();
@@ -98,9 +98,9 @@ public:
      * param buffer: byte array that contains the data to send
      * param size: number of bytes to send
      *
-     * return: shrpe_result_t SHRPE_OK or SHRPE_ERR_TIMEOUT
+     * return: number of bytes written or SHRPE_ERR_TIMEOUT
      */
-    shrpe_result_t sendUploadObject(const uint8_t *buffer, size_t size);
+    int sendUploadObject(const uint8_t *buffer, size_t size);
     
     /*
      * Receive an UploadObject acknowledgment.

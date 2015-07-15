@@ -23,8 +23,9 @@
 #include "packet_framing_library/Timer.cpp"
 
 Framing framing;
-byte input_buff[100], upl_obj_ack_buff[1], dl_obj_buff[38];
+byte input_buff[100], upl_obj_ack_buff[1], dl_obj_buff[39];
 int input_length, crc_valid, result;
+size_t dl_obj_len;
 
 Shrpe::Shrpe()
 {
@@ -49,9 +50,10 @@ void Shrpe::loop()
   //while pending message in shield
 	
   while (!digitalRead(2)) {
-		uint8_t msg[39];
-		uint8_t length;
-    if(getNextMessage(msg, length) == SHRPE_OK) {
+		int msg[39];
+		size_t length;
+    if(getNextMessage(msg, &length) == SHRPE_OK) {
+			Serial.println(length);
 			switch (msg[0]) {
 			case SHRPE_RESET_EVENT:
 				_state = SHRPE_STATE_DISCONNECTED;
@@ -65,6 +67,7 @@ void Shrpe::loop()
 				for(int i = 0; i < length; i++) {
 					dl_obj_buff[i] = msg[i+1];
 				}
+				dl_obj_len = length-1;
         break;
       default:
         break;
@@ -73,7 +76,7 @@ void Shrpe::loop()
   }
 }
 
-shrpe_result_t Shrpe::getNextMessage(uint8_t* msg, size_t length)
+shrpe_result_t Shrpe::getNextMessage(int* msg, size_t *length)
 {
 	uint8_t data_array[1] = {SHRPE_GET_NEXT_MSG};
   if (framing.sendFramedData(data_array, 1)) {
@@ -83,7 +86,7 @@ shrpe_result_t Shrpe::getNextMessage(uint8_t* msg, size_t length)
 	  for (int i = 0; i < input_length; i++){
 	    msg[i] = input_buff[i];
 	  }
-			length = input_length;
+			*length = input_length;
 			return SHRPE_OK;  
     }
 		return SHRPE_ERR_CRC;
@@ -91,7 +94,7 @@ shrpe_result_t Shrpe::getNextMessage(uint8_t* msg, size_t length)
   return SHRPE_ERR_TIMEOUT;
 }
 
-shrpe_result_t Shrpe::sendUploadObject(const uint8_t *buffer, size_t size)
+int Shrpe::sendUploadObject(const uint8_t *buffer, size_t size)
 {
   // send UploadObject command
   int result = size;
@@ -103,7 +106,7 @@ shrpe_result_t Shrpe::sendUploadObject(const uint8_t *buffer, size_t size)
 	if(framing.sendFramedData(msg, size+1)) {
 		framing.receiveFramedData(input_buff, input_length, crc_valid);
 		if (crc_valid == 1)  {
-			return (shrpe_result_t) input_buff[0];
+			return input_buff[0];
 		}
 		return SHRPE_ERR_CRC;
 	}
@@ -122,7 +125,12 @@ int Shrpe::receiveUploadObjectAck()
 
 int Shrpe::receiveDownloadObject(uint8_t *buffer, size_t length)
 {
-  return 0;
+	for(int i = 0; i < length; i++) {
+		*(buffer+i) = dl_obj_buff[i];
+	}
+	int len = dl_obj_len;
+	dl_obj_len = 0;
+  return len;
 }
 
 int Shrpe::available()

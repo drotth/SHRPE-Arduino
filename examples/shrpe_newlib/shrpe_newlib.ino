@@ -3,7 +3,7 @@
 
 Shrpe shrpe;
 SoftwareSerial mySerial(10, 11); // RX, TX
-shrpe_state_t currentState, oldState;
+shrpe_state_t currentState;
 uint8_t loopCounter = 0;
 bool isSending = false;
 
@@ -12,6 +12,8 @@ uint8_t upl_obj[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                      21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
                      31, 32, 33, 34, 35, 36, 37, 38, 39, 40
                     };
+uint8_t receiveBuffer[38];
+
 void setup() {
   //init shield and serialport
   shrpe.begin();
@@ -36,15 +38,22 @@ void loop() {
       }
     } else {
       //time to send?
-      shrpe_result_t result;
+      int result;
       if (++loopCounter % 5 == 0) {
         result = shrpe.sendUploadObject(upl_obj, sizeof(upl_obj));
         mySerial.print("Sent upload object with result: ");
         mySerial.println(result);
-        if (result == SHRPE_OK) {
+        if (result == sizeof(upl_obj)) {
           isSending = true;
         }
       }
+    }
+    // download an object if any
+    int result = shrpe.receiveDownloadObject(receiveBuffer, sizeof(receiveBuffer));
+    if (result > 0) {
+      // if object received
+      mySerial.print("\nReceived download object of length: ");    
+      mySerial.println(result);
     }
   } else {
       //check shield state
