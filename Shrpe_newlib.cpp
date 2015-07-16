@@ -128,28 +128,51 @@ int Shrpe::receiveDownloadObject(uint8_t *buffer, size_t length)
 	for(int i = 0; i < length; i++) {
 		*(buffer+i) = dl_obj_buff[i];
 	}
-	int len = dl_obj_len;
-	dl_obj_len = 0;
-  return len;
+  return dl_obj_len;
 }
 
 int Shrpe::available()
 {
-  return 0;
+	/*
+	Serial.print("dl_obj_len: ");
+	Serial.println(dl_obj_len);
+	
+	Serial.print("sizeof(arr): ");
+	Serial.println(sizeof(dl_obj_buff));
+	
+	Serial.print("sizeof(arr)/sizeof(arr[0]): ");
+	Serial.println(sizeof(dl_obj_buff)/sizeof(dl_obj_buff[0]));
+	*/
+  return (dl_obj_len);
 }
 
 int Shrpe::read()
 {
-  return -1;
+	if(available()) {
+		int byte = dl_obj_buff[0];
+		for(int i = 1; i <= available(); i++) {
+			dl_obj_buff[i-1] = dl_obj_buff[i];
+		}
+		dl_obj_len--;
+		return byte;
+	}
+	return -1;
 }
 
 int Shrpe::peek()
 {
-  return -1;
+  if(available()) {
+		return dl_obj_buff[0];
+	}
+	return -1;
 }
 
 void Shrpe::flush()
 {
+	for(int i = 0; i < dl_obj_len; i++) {
+		dl_obj_buff[i] = NULL;
+	}
+	dl_obj_len = 0;
 }
 
 size_t Shrpe::write(uint8_t byte)

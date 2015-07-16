@@ -43,6 +43,7 @@ void loop() {
         result = shrpe.sendUploadObject(upl_obj, sizeof(upl_obj));
         mySerial.print("Sent upload object with result: ");
         mySerial.println(result);
+        //result = (sizeof(upl_obj) < 40) ?  sizeof(upl_obj) : 40;
         if (result == sizeof(upl_obj) || result == 40) {
           isSending = true;
         }
@@ -50,6 +51,12 @@ void loop() {
     }
     // download an object if any
     int result = shrpe.receiveDownloadObject(receiveBuffer, sizeof(receiveBuffer));
+    while(shrpe.available()) {
+      mySerial.print(shrpe.read());
+      if(shrpe.available() >= 1)
+        mySerial.print(", ");
+    }
+    //shrpe.flush();
     if (result > 0) {
       // if object received
       mySerial.print("\nReceived download object of length: ");    
