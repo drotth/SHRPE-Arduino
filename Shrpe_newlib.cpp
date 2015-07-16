@@ -24,13 +24,16 @@
 
 Framing framing;
 byte input_buff[100], upl_obj_ack_buff[1], dl_obj_buff[38];
+byte intern_dl_buf[38], intern_upl_buf[40];
 int input_length, crc_valid, result;
-size_t dl_obj_len;
+size_t dl_obj_len, intern_upl_len, intern_dl_len;
 
 Shrpe::Shrpe()
 {
 	// Driver initialization
     _state = SHRPE_STATE_DISCONNECTED;
+		intern_dl_len = 38;
+		intern_upl_len = 0;
 }
 
 int Shrpe::begin()
@@ -148,6 +151,9 @@ int Shrpe::available()
 
 int Shrpe::read()
 {
+	if(!available()) {
+		receiveDownloadObject(intern_dl_buf, intern_dl_len);
+	}
 	if(available()) {
 		int byte = dl_obj_buff[0];
 		for(int i = 1; i <= available(); i++) {

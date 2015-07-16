@@ -50,11 +50,16 @@ void loop() {
       }
     }
     // download an object if any
-    int result = shrpe.receiveDownloadObject(receiveBuffer, sizeof(receiveBuffer));
+    int result;
+    //int result = shrpe.receiveDownloadObject(receiveBuffer, sizeof(receiveBuffer));
     while(shrpe.available()) {
       mySerial.print(shrpe.read());
-      if(shrpe.available() >= 1)
+      if(shrpe.available() >= 1) {
         mySerial.print(", ");
+      } else {
+        mySerial.println();
+        mySerial.println();
+      }
     }
     //shrpe.flush();
     if (result > 0) {
