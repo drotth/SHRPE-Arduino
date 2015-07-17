@@ -19,6 +19,9 @@ void setup() {
   shrpe.begin();
   mySerial.begin(115200);
   mySerial.println("\nStarting SHRPE demo example");
+
+  // get current state
+  currentState = shrpe.getState();
 }
 
 void loop() {
@@ -27,40 +30,52 @@ void loop() {
   //let shield lib execute
   shrpe.loop();
 
-  if (currentState == SHRPE_STATE_CONNECTED) {
-    int ack_res;
-    if (isSending) {
-      ack_res = shrpe.receiveUploadObjectAck();
-      mySerial.print("Received upload object ack: ");
-      mySerial.println(ack_res);
-      if (ack_res == 0) {
-        isSending = false;
-      }
-    } else {
-      //time to send?
-      int result;
-      if (++loopCounter % 5 == 0) {
-        result = shrpe.sendUploadObject(upl_obj, sizeof(upl_obj));
-        mySerial.print("Sent upload object with result: ");
-        mySerial.println(result);
-        //result = (sizeof(upl_obj) < 40) ?  sizeof(upl_obj) : 40;
-        if (result == sizeof(upl_obj) || result == 40) {
-          isSending = true;
+  // check shield state
+  shrpe_state_t newState;
+  newState = shrpe.getState();
+  if (newState != currentState) {
+    Serial.print("New shield state: ");
+    Serial.println(newState);
+    currentState = newState;
+  }
+
+  uint8_t ack_res[2];
+  size_t buf_len = 2;
+  int ack_len;
+  if (isSending) {
+    ack_len = shrpe.receiveUploadObjectAck(ack_res, buf_len);
+    if(ack_len == 1) {
+      mySerial.print("ack received?: ");
+      mySerial.println(ack_res[0]);
+      
+      if(ack_res[0] == 1) {
+        mySerial.print("ack result: ");
+        mySerial.println(ack_res[1]);
+        
+        if (ack_res[1] == 0) {
+          isSending = false;
         }
-      }
-    }
-    // download an object if any
-    int result = shrpe.receiveDownloadObject(receiveBuffer, sizeof(receiveBuffer));
-    if (result > 0) {
-      // if object received
-      mySerial.print("\nReceived download object of length: ");    
-      mySerial.println(result);
+      }    
     }
   } else {
-      //check shield state
-      currentState = shrpe.getState();
-      mySerial.print("currentState: ");
-      mySerial.println(currentState);
+    //time to send?
+    int result;
+    if (++loopCounter % 5 == 0) {
+      result = shrpe.sendUploadObject(upl_obj, sizeof(upl_obj));
+      mySerial.print("Sent upload object with result: ");
+      mySerial.println(result);
+      //result = (sizeof(upl_obj) < 40) ?  sizeof(upl_obj) : 40;
+      if (result == sizeof(upl_obj) || result == 40) {
+        isSending = true;
+      }
+    }
+  }
+  // download an object if any
+  int result = shrpe.receiveDownloadObject(receiveBuffer, sizeof(receiveBuffer));
+  if (result > 0) {
+    // if object received
+    mySerial.print("\nReceived download object of length: ");
+    mySerial.println(result);
   }
   delay(1000);
 }

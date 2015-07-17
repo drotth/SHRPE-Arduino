@@ -23,10 +23,10 @@
 #include "packet_framing_library/Timer.cpp"
 
 Framing framing;
-byte input_buff[100], upl_obj_ack_buff[1], dl_obj_buff[38];
+byte input_buff[100], upl_obj_ack_buff[2], dl_obj_buff[38];
 byte intern_dl_buf[38], intern_upl_buf[40];
 int input_length, crc_valid, result;
-size_t dl_obj_len, intern_upl_len, intern_dl_len;
+size_t dl_obj_len, intern_upl_len, intern_dl_len, ack_len;
 
 Shrpe::Shrpe()
 {
@@ -56,7 +56,6 @@ void Shrpe::loop()
 		int msg[39];
 		size_t length;
     if(getNextMessage(msg, &length) == SHRPE_OK) {
-			Serial.println(length);
 			switch (msg[0]) {
 			case SHRPE_RESET_EVENT:
 				_state = SHRPE_STATE_DISCONNECTED;
@@ -64,7 +63,9 @@ void Shrpe::loop()
         _state = (shrpe_state_t) msg[1];
         break;
       case SHRPE_UPLOAD_OBJECT_ACK:
-				upl_obj_ack_buff[0] = msg[1];
+				upl_obj_ack_buff[0] = 1;
+				upl_obj_ack_buff[1] = msg[1];
+				ack_len = length-1;
         break;
       case SHRPE_DOWNLOAD_OBJECT:
 				for(int i = 0; i < length-1; i++) {
@@ -116,14 +117,23 @@ int Shrpe::sendUploadObject(const uint8_t *buffer, size_t size)
   return SHRPE_ERR_TIMEOUT;
 }
 
-int Shrpe::receiveUploadObjectAck()
+int Shrpe::receiveUploadObjectAck(uint8_t *buffer, size_t length)
 {
   // check if UploadObjectAck is received
   // for now assume that an ack is received
   //buffer[0] = 1; // 1 => ack is received, 0 => tx failed, no ack received
   //buffer[1] = 0; // ack payload if ack received OR error code if tx failed
   //result = upl_obj_ack_buff[0];
-  return upl_obj_ack_buff[0];
+	if(length < 2) {
+		return SHRPE_ERR_LEN;
+	}
+	if(upl_obj_ack_buff[0] == 1) {
+		*buffer = upl_obj_ack_buff[0];
+		*(buffer+1) = upl_obj_ack_buff[1];
+		upl_obj_ack_buff[0] = 0;
+		return ack_len;
+	}
+	return SHRPE_ERR_UNDEFINED;
 }
 
 int Shrpe::receiveDownloadObject(uint8_t *buffer, size_t length)

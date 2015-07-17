@@ -20,6 +20,9 @@ void setup() {
   shrpe.begin();
   mySerial.begin(115200);
   mySerial.println("\nStarting SHRPE demo example");
+
+  // get current state
+  currentState = shrpe.getState();
 }
 
 void loop() {
@@ -28,44 +31,46 @@ void loop() {
   //let shield lib execute
   shrpe.loop();
 
-  if (currentState == SHRPE_STATE_CONNECTED) {
-      //time to send?
-      int resultWrite;
-      if (++loopCounter % 5 == 0) {
-        //resultWrite = shrpe.write(oneByte);
-        resultWrite = shrpe.write(upl_obj, 41);
-        if(resultWrite == sizeof(upl_obj) || 40) {
-          int flushResult = shrpe.flushWriteBuffer();
-          if(flushResult < 0) {
-            mySerial.print("failed to flushWriteBuffer(), result: ");
-            mySerial.println(flushResult);
-          }
-        }
-        mySerial.print("wrote with result: ");
-        mySerial.println(resultWrite);
-      }
-    // download an object if any
-    int result;
-    while(shrpe.available()) {
-      mySerial.print(shrpe.read());
-      if(shrpe.available() >= 1) {
-        mySerial.print(", ");
-      } else {
-        mySerial.println();
-        mySerial.println();
+  // check shield state
+  shrpe_state_t newState;
+  newState = shrpe.getState();
+  if (newState != currentState) {
+    Serial.print("New shield state: ");
+    Serial.println(newState);
+    currentState = newState;
+  }
+
+  //time to send?
+  int resultWrite;
+  if (++loopCounter % 5 == 0) {
+    //resultWrite = shrpe.write(oneByte);
+    resultWrite = shrpe.write(upl_obj, 41);
+    if (resultWrite == sizeof(upl_obj) || 40) {
+      int flushResult = shrpe.flushWriteBuffer();
+      if (flushResult < 0) {
+        mySerial.print("failed to flushWriteBuffer(), result: ");
+        mySerial.println(flushResult);
       }
     }
-    //shrpe.flush();
-    if (result > 0) {
-      // if object received
-      mySerial.print("\nReceived download object of length: ");    
-      mySerial.println(result);
+    mySerial.print("wrote with result: ");
+    mySerial.println(resultWrite);
+  }
+  // download an object if any
+  int result;
+  while (shrpe.available()) {
+    mySerial.print(shrpe.read());
+    if (shrpe.available() >= 1) {
+      mySerial.print(", ");
+    } else {
+      mySerial.println();
+      mySerial.println();
     }
-  } else {
-      //check shield state
-      currentState = shrpe.getState();
-      mySerial.print("currentState: ");
-      mySerial.println(currentState);
+  }
+  //shrpe.flush();
+  if (result > 0) {
+    // if object received
+    mySerial.print("\nReceived download object of length: ");
+    mySerial.println(result);
   }
   delay(1000);
 }
