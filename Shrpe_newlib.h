@@ -170,7 +170,7 @@ public:
      *
      * return: 1 if success, otherwise 0
      */
-    virtual size_t write(uint8_t byte);
+    virtual size_t write(const uint8_t byte);
     /*
      * Write the next bytes of an UploadObject message
      *

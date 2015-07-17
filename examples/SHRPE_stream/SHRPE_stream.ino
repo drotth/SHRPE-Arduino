@@ -13,6 +13,7 @@ uint8_t upl_obj[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                      31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41
                     };
 uint8_t receiveBuffer[38];
+uint8_t oneByte = 5;
 
 void setup() {
   //init shield and serialport
@@ -28,29 +29,33 @@ void loop() {
   shrpe.loop();
 
   if (currentState == SHRPE_STATE_CONNECTED) {
-    int ack_res;
-    if (isSending) {
-      ack_res = shrpe.receiveUploadObjectAck();
-      mySerial.print("Received upload object ack: ");
-      mySerial.println(ack_res);
-      if (ack_res == 0) {
-        isSending = false;
-      }
-    } else {
       //time to send?
-      int result;
+      int resultWrite;
       if (++loopCounter % 5 == 0) {
-        result = shrpe.sendUploadObject(upl_obj, sizeof(upl_obj));
-        mySerial.print("Sent upload object with result: ");
-        mySerial.println(result);
-        //result = (sizeof(upl_obj) < 40) ?  sizeof(upl_obj) : 40;
-        if (result == sizeof(upl_obj) || result == 40) {
-          isSending = true;
+        //resultWrite = shrpe.write(oneByte);
+        resultWrite = shrpe.write(upl_obj, 41);
+        if(resultWrite == sizeof(upl_obj) || 40) {
+          int flushResult = shrpe.flushWriteBuffer();
+          if(flushResult < 0) {
+            mySerial.print("failed to flushWriteBuffer(), result: ");
+            mySerial.println(flushResult);
+          }
         }
+        mySerial.print("wrote with result: ");
+        mySerial.println(resultWrite);
+      }
+    // download an object if any
+    int result;
+    while(shrpe.available()) {
+      mySerial.print(shrpe.read());
+      if(shrpe.available() >= 1) {
+        mySerial.print(", ");
+      } else {
+        mySerial.println();
+        mySerial.println();
       }
     }
-    // download an object if any
-    int result = shrpe.receiveDownloadObject(receiveBuffer, sizeof(receiveBuffer));
+    //shrpe.flush();
     if (result > 0) {
       // if object received
       mySerial.print("\nReceived download object of length: ");    

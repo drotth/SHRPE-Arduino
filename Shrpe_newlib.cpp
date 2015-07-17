@@ -131,7 +131,12 @@ int Shrpe::receiveDownloadObject(uint8_t *buffer, size_t length)
 	for(int i = 0; i < length; i++) {
 		*(buffer+i) = dl_obj_buff[i];
 	}
-  return dl_obj_len;
+	int len = dl_obj_len;
+	for(int i = 0; i < dl_obj_len; i++) {
+		dl_obj_buff[i] = NULL;
+	}
+	dl_obj_len = 0;
+  return len;
 }
 
 int Shrpe::available()
@@ -175,23 +180,42 @@ int Shrpe::peek()
 
 void Shrpe::flush()
 {
-	for(int i = 0; i < dl_obj_len; i++) {
-		dl_obj_buff[i] = NULL;
+	for(int i = 0; i < intern_dl_len; i++) {
+		intern_dl_buf[i] = NULL;
 	}
-	dl_obj_len = 0;
+	intern_dl_len = 0;
 }
 
-size_t Shrpe::write(uint8_t byte)
+size_t Shrpe::write(const uint8_t byte)
 {
+	if(intern_upl_len < 40) {
+		intern_upl_buf[intern_upl_len++] = byte;
+		return 1;
+	}
   return 0;
 }
 
 size_t Shrpe::write(const uint8_t *buffer, size_t size)
 {
-  return 0;
+	if(size > 40) {
+		size = 40;
+	}
+	intern_upl_len = size;
+	for(int i = 0; i < size; i++) {
+		intern_upl_buf[i] = *(buffer+i);
+	}
+	return intern_upl_len;
 }
 
 int Shrpe::flushWriteBuffer()
 {
-  return SHRPE_OK;
+	int result = sendUploadObject(intern_upl_buf, intern_upl_len);
+	if(result == intern_upl_len || result == 40) {
+		for(int i = 0; i < intern_dl_len; i++) {
+			intern_upl_buf[i] = NULL;
+		}
+		intern_upl_len = 0;
+		return 0;
+	}
+  return SHRPE_ERR_LEN;
 }
