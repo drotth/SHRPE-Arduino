@@ -149,6 +149,22 @@ int Shrpe::receiveDownloadObject(uint8_t *buffer, size_t length)
   return len;
 }
 
+int Shrpe::setContacts(uint8_t contacts)
+{
+	// send UploadObject command
+	uint8_t msg[2];
+	msg[0] = SHRPE_SET_CONTACTS;
+	msg[1] = contacts;
+	if(framing.sendFramedData(msg, 2)) {
+		framing.receiveFramedData(input_buff, input_length, crc_valid);
+		if (crc_valid == 1)  {
+			return input_buff[0];
+		}
+		return SHRPE_ERR_CRC;
+	}
+  return SHRPE_ERR_TIMEOUT;
+}
+
 int Shrpe::available()
 {
 	/*

@@ -54,6 +54,14 @@ void loop() {
         
         if (ack_res[1] == 0) {
           isSending = false;
+          
+          //setContacts after an ack has been received
+          static uint8_t contacts = 0;
+          //alternate between 0 and 2
+          contacts = (contacts ^ 0x02);
+          int result = shrpe.setContacts(contacts);
+          mySerial.print("setContacts result: ");
+          mySerial.println(result);
         }
       }    
     }

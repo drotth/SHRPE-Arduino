@@ -44,11 +44,12 @@ extern "C" {
 	typedef enum {
 		SHRPE_UPLOAD_OBJECT = 2,
 		SHRPE_GET_NEXT_MSG = 3,
-		SHRPE_GET_STATE = 5
+		SHRPE_GET_STATE = 5, 
+		SHRPE_SET_CONTACTS = 6
 	} shrpe_msg_t;
 	typedef enum {
 		SHRPE_RESET_EVENT = -1,
-		SHRPE_UPLOAD_OBJECT_ACK = 0,
+		SHRPE_UPLOAD_OBJECT_ACK = 2,
 		SHRPE_DOWNLOAD_OBJECT = 4,
 		SHRPE_STATE_CHANGED = 5
 	} shrpe_event_t;
@@ -110,7 +111,7 @@ public:
      *
      * return: number of bytes received or error (<0)
      */
-    int receiveUploadObjectAck();
+    int receiveUploadObjectAck(uint8_t *buffer, size_t length);
     
     /*
      * Receive a DownloadObject message, if any pending
