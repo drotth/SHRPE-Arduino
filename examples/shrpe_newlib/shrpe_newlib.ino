@@ -36,8 +36,8 @@ void loop() {
   shrpe_state_t newState;
   newState = shrpe.getState();
   if (newState != currentState) {
-    Serial.print("New shield state: ");
-    Serial.println(newState);
+    mySerial.print("New shield state: ");
+    mySerial.println(newState);
     currentState = newState;
   }
 

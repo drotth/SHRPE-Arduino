@@ -22,21 +22,23 @@
 #include "packet_framing_library/Framing.cpp"
 #include "packet_framing_library/Timer.cpp"
 
+#define HWREV_2
+
 Framing framing;
 byte input_buff[100], upl_obj_ack_buff[2], dl_obj_buff[38];
 byte intern_dl_buf[38], intern_upl_buf[40];
 int input_length, crc_valid, result, timer_counter;
 size_t dl_obj_len, intern_upl_len, intern_dl_len, ack_len;
 static int reset_event = -1;
-bool reset_msg_sent = false;
+bool reset_event_rxed = false;
 
 Shrpe::Shrpe()
 {
 	// Driver initialization
-    _state = SHRPE_STATE_DISCONNECTED;
+    _state = SHRPE_STATE_UNKNOWN;
 		intern_dl_len = 38;
 		intern_upl_len = 0;
-		timer_counter = 1200000000;
+		timer_counter = 1000;
 }
 
 int Shrpe::begin()
@@ -49,26 +51,33 @@ int Shrpe::begin()
   digitalWrite(2, HIGH); // turn on pull-up resistor
   // wait for first state change event
 	
-	
-	do {
-	loop();
-	}
-  while(reset_event < 0 && timer_counter--);
-	if(timer_counter == 0 && !reset_msg_sent) {
-		resetShield();
-		reset_msg_sent = true;
-		Serial.println("timer timeout, sent reset msg");
-	}
-  return _state;
-	
-
+#ifdef HWREV_2
 	/*
+	*	Since there's a physical jumper that must be in place
+	* in order to have a working communication between the 
+	*	Arduino board & shield, this reset-method is easier.
+	*/
 	while(reset_event < 0) {
 		reset_event = resetShield();
 		delay(2000);
 	}
 	return SHRPE_OK;
-	*/
+#else
+	
+	do {
+		loop();
+		//a minimum of 1ms delay for the loop execution time.
+		delay(1);
+	}
+  while(reset_event < 0 && timer_counter--);
+	if(!reset_event_rxed) {
+		resetShield();
+		Serial.println("timer timeout, sent reset msg");
+	}
+	Serial.print("Timer_counter: ");
+	Serial.println(timer_counter);
+  return _state;
+#endif
 }
 
 void Shrpe::loop()
@@ -83,6 +92,7 @@ void Shrpe::loop()
 			case SHRPE_RESET_EVENT:
 				reset_event = msg[0];
 				_state = SHRPE_STATE_CONNECTING;
+				reset_event_rxed = true;
 				Serial.println("RESET EVENT RECEIVED. state = CONNECTING");
       case SHRPE_STATE_CHANGED:
         _state = (shrpe_state_t) msg[1];
@@ -125,6 +135,8 @@ shrpe_result_t Shrpe::getNextMessage(int* msg, size_t *length)
 
 int Shrpe::sendUploadObject(const uint8_t *buffer, size_t size)
 {
+	if(_state < SHRPE_STATE_CONNECTING)
+		return SHRPE_STATE_ILLEGAL;
   // send UploadObject command
   int result = size;
 	uint8_t msg[size+1];

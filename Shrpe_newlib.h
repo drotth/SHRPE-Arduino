@@ -27,7 +27,8 @@
 
 extern "C" {
   typedef enum {
-    SHRPE_STATE_DISCONNECTED = -1,
+    SHRPE_STATE_UNKNOWN = -1,
+		SHRPE_STATE_ILLEGAL = -7,
     SHRPE_STATE_CONNECTING = 16,
     SHRPE_STATE_CONNECTED = 32
   } shrpe_state_t;
@@ -38,7 +39,7 @@ extern "C" {
     SHRPE_ERR_STATE = -3,
     SHRPE_ERR_CRC = -4,
     SHRPE_ERR_LEN = -5,
-    SHRPE_ERR_SEND = -6
+    SHRPE_ERR_SEND = -6,
     // Etc
   } shrpe_result_t;
 	typedef enum {
