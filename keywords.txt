@@ -7,3 +7,4 @@ isSendingUploadObject	KEYWORD2
 receiveUploadObjectAck	KEYWORD2
 receiveDownloadObject	KEYWORD2
 setContacts	KEYWORD2
+resetShield	KEYWORD2

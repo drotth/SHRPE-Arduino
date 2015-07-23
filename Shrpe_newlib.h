@@ -42,13 +42,14 @@ extern "C" {
     // Etc
   } shrpe_result_t;
 	typedef enum {
+		SHRPE_RESET_SHIELD = 1,
 		SHRPE_UPLOAD_OBJECT = 2,
 		SHRPE_GET_NEXT_MSG = 3,
 		SHRPE_GET_STATE = 5, 
 		SHRPE_SET_CONTACTS = 6
 	} shrpe_msg_t;
 	typedef enum {
-		SHRPE_RESET_EVENT = -1,
+		SHRPE_RESET_EVENT = 1,
 		SHRPE_UPLOAD_OBJECT_ACK = 2,
 		SHRPE_DOWNLOAD_OBJECT = 4,
 		SHRPE_STATE_CHANGED = 5
@@ -67,11 +68,13 @@ private:
      */
 		shrpe_result_t getNextMessage(int* msg, size_t* length);
 		
+		
 public:
     Shrpe();
 
     /* 
      * Initiate the shield
+		 * Reeturns the shield state after init phase.
      */
     int begin();
 
@@ -131,6 +134,13 @@ public:
      * return: result 
      */
     int setContacts(uint8_t contacts);
+		
+		/*
+     * Resets the shield.
+     *
+     * return: result 
+     */
+    int resetShield(void);
     
     /*
      * Get shield information

@@ -25,8 +25,10 @@
 Framing framing;
 byte input_buff[100], upl_obj_ack_buff[2], dl_obj_buff[38];
 byte intern_dl_buf[38], intern_upl_buf[40];
-int input_length, crc_valid, result;
+int input_length, crc_valid, result, timer_counter;
 size_t dl_obj_len, intern_upl_len, intern_dl_len, ack_len;
+static int reset_event = -1;
+bool reset_msg_sent = false;
 
 Shrpe::Shrpe()
 {
@@ -34,6 +36,7 @@ Shrpe::Shrpe()
     _state = SHRPE_STATE_DISCONNECTED;
 		intern_dl_len = 38;
 		intern_upl_len = 0;
+		timer_counter = 1200000000;
 }
 
 int Shrpe::begin()
@@ -45,7 +48,27 @@ int Shrpe::begin()
   pinMode(2, INPUT); // IRQ-PIN
   digitalWrite(2, HIGH); // turn on pull-up resistor
   // wait for first state change event
-  return SHRPE_OK;
+	
+	
+	do {
+	loop();
+	}
+  while(reset_event < 0 && timer_counter--);
+	if(timer_counter == 0 && !reset_msg_sent) {
+		resetShield();
+		reset_msg_sent = true;
+		Serial.println("timer timeout, sent reset msg");
+	}
+  return _state;
+	
+
+	/*
+	while(reset_event < 0) {
+		reset_event = resetShield();
+		delay(2000);
+	}
+	return SHRPE_OK;
+	*/
 }
 
 void Shrpe::loop()
@@ -58,7 +81,9 @@ void Shrpe::loop()
     if(getNextMessage(msg, &length) == SHRPE_OK) {
 			switch (msg[0]) {
 			case SHRPE_RESET_EVENT:
-				_state = SHRPE_STATE_DISCONNECTED;
+				reset_event = msg[0];
+				_state = SHRPE_STATE_CONNECTING;
+				Serial.println("RESET EVENT RECEIVED. state = CONNECTING");
       case SHRPE_STATE_CHANGED:
         _state = (shrpe_state_t) msg[1];
         break;
@@ -156,6 +181,21 @@ int Shrpe::setContacts(uint8_t contacts)
 	msg[0] = SHRPE_SET_CONTACTS;
 	msg[1] = contacts;
 	if(framing.sendFramedData(msg, 2)) {
+		framing.receiveFramedData(input_buff, input_length, crc_valid);
+		if (crc_valid == 1)  {
+			return input_buff[0];
+		}
+		return SHRPE_ERR_CRC;
+	}
+  return SHRPE_ERR_TIMEOUT;
+}
+
+int Shrpe::resetShield(void)
+{
+	// send UploadObject command
+	uint8_t msg[1];
+	msg[0] = SHRPE_RESET_SHIELD;
+	if(framing.sendFramedData(msg, 1)) {
 		framing.receiveFramedData(input_buff, input_length, crc_valid);
 		if (crc_valid == 1)  {
 			return input_buff[0];

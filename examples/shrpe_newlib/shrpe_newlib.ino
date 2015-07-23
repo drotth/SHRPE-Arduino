@@ -16,9 +16,11 @@ uint8_t receiveBuffer[38];
 
 void setup() {
   //init shield and serialport
-  shrpe.begin();
+  int state = shrpe.begin();
   mySerial.begin(115200);
   mySerial.println("\nStarting SHRPE demo example");
+  mySerial.print("Current state: ");
+  mySerial.println(state);
 
   // get current state
   currentState = shrpe.getState();
@@ -29,7 +31,7 @@ void loop() {
 
   //let shield lib execute
   shrpe.loop();
-
+  
   // check shield state
   shrpe_state_t newState;
   newState = shrpe.getState();
