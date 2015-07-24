@@ -17,6 +17,7 @@
 #define MSG_UPLOAD_OBJECT		0x02
 #define MSG_GET_NEXT_DATA		0x03
 #define MSG_DOWNLOAD_OBJECT		0x04
+#define MSG_GET_STATE 			0x05
 
 class Shrpe
 {
@@ -34,7 +35,7 @@ class Shrpe
 	/*
 	  Writes a single (unsigned) byte to the SHRPE Shield.
 	*/
-	int write(uint8_t data_byte);
+	int write(uint8_t data_byte, uint8_t msg_type);
 	/*
 	  Writes an array of (unsigned) bytes to the SHRPE Shield.
 	  The function is capable of sending between 1-40 bytes.
@@ -42,7 +43,7 @@ class Shrpe
 	  @param	size	size of the array.
 	  @return			0 if write function was successful, -1 otherwise.
 	*/
-	int write(uint8_t array[], uint8_t size);
+	int write(uint8_t array[], uint8_t size, uint8_t msg_type);
 	/*
 	  Receives an array of (unsigned) bytes from the SHRPE Shield.
 	  The function is capable of receiving up to 38 bytes.

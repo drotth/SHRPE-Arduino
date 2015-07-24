@@ -15,7 +15,8 @@
 
 void shrpe_irq_handler();
 
-volatile bool dataAvailable = false;
+volatile uint8_t dataAvailable2 = 0;
+
 
 Framing framing;
 byte input_buff[100];
@@ -29,26 +30,23 @@ Shrpe::Shrpe()
 
 void Shrpe::begin()
 {
-  delay(6000); // wait for the shield to boot up
+  //delay(2000); // wait for the shield to boot up
   Serial.begin(115200);
   framing.setTimout(0.1);
   pinMode(2, INPUT); // IRQ-PIN
-  pinMode(12, OUTPUT); // "DATA AVAILABLE"-PIN
-  digitalWrite(12, LOW);
   digitalWrite(2, HIGH); // turn on pull-up resistor
-  attachInterrupt(0, shrpe_irq_handler, FALLING);
 }
 
-int Shrpe::write(uint8_t data_byte)
+int Shrpe::write(uint8_t data_byte, uint8_t msg_type)
 {
   uint8_t data_array[1] = {data_byte};
-  return write(data_array, 1);
+  return write(data_array, 1, msg_type);
 }
 
-int Shrpe::write(uint8_t array[], uint8_t size)
+int Shrpe::write(uint8_t array[], uint8_t size, uint8_t msg_type)
 {
   uint8_t msg_array[size+1];
-  msg_array[0] = MSG_UPLOAD_OBJECT;
+  msg_array[0] = msg_type;
   for (int i = 0; i < size; i++){
 		msg_array[i+1] = array[i];
   }
@@ -81,14 +79,8 @@ int Shrpe::read(uint8_t* buffer_ptr, uint8_t size)
 
 bool Shrpe::available()
 {
-  if (digitalRead(12) == HIGH){
-	digitalWrite(12, LOW);
+  if (!digitalRead(2)){
 	return true;
   }
   else return false;
-}
-
-void shrpe_irq_handler()
-{
-  digitalWrite(12, HIGH);
 }

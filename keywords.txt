@@ -1,4 +1,10 @@
-Shrpe	KEYWORD1
+Shrpe_newlib	KEYWORD1
 begin	KEYWORD2
-write	KEYWORD2
-read	KEYWORD2
+loop	KEYWORD2
+getState	KEYWORD2
+sendUploadObject	KEYWORD2
+isSendingUploadObject	KEYWORD2
+receiveUploadObjectAck	KEYWORD2
+receiveDownloadObject	KEYWORD2
+setContacts	KEYWORD2
+resetShield	KEYWORD2
