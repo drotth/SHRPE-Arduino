@@ -1,6 +1,9 @@
 /*
   Shrpe.cpp - Library for Arduino Shrpe shield.
   Copyright (c) 2011-2014 Arduino LLC.  All right reserved.
+	Authors: Andreas Drotth & Soded Alatia, 
+  Modified: July 23, 2015.
+  Release version: v3.0
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -164,8 +167,13 @@ int Shrpe::receiveUploadObjectAck(uint8_t *buffer, size_t length)
 	if(length < 2) {
 		return SHRPE_ERR_LEN;
 	}
-	if(upl_obj_ack_buff[0] == 1) {
+	if(upl_obj_ack_buff[1] == 0) {
 		*buffer = upl_obj_ack_buff[0];
+		*(buffer+1) = upl_obj_ack_buff[1];
+		upl_obj_ack_buff[0] = 0;
+		return ack_len;
+	} else {
+		*buffer = 0;
 		*(buffer+1) = upl_obj_ack_buff[1];
 		upl_obj_ack_buff[0] = 0;
 		return ack_len;
