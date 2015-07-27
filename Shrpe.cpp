@@ -20,7 +20,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "Shrpe_newlib.h"
+#include "Shrpe.h"
 #include "packet_framing_library/CRC_16.cpp"
 #include "packet_framing_library/Framing.cpp"
 #include "packet_framing_library/Timer.cpp"
