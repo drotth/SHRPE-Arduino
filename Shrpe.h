@@ -1,63 +1,201 @@
 /*
-  Shrpe.h
-  - Library for usage together with the SHRPE shield.
-  Authors: Andreas Drotth & Soded Alatia, 
-  Created Date: May 28, 2015.
-  Last Modified: July 1, 2015.
-  Release version: v2.0
+  WiFi.h - Library for Arduino Wifi shield.
+  Copyright (c) 2011-2014 Arduino LLC.  All right reserved.
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef Shrpe_h
-#define Shrpe_h
+#ifndef Shrpe_newlib_h
+#define Shrpe_newlib_h
 
 #include "Arduino.h"
+#include "Stream.h"
 
-#define MSG_RES_OK				0x00
-#define MSG_RES_NOT_OK			0x01
-#define MSG_UPLOAD_OBJECT		0x02
-#define MSG_GET_NEXT_DATA		0x03
-#define MSG_DOWNLOAD_OBJECT		0x04
-#define MSG_GET_STATE 			0x05
 
-class Shrpe
+
+extern "C" {
+  typedef enum {
+    SHRPE_STATE_UNKNOWN = -1,
+		SHRPE_STATE_ILLEGAL = -7,
+    SHRPE_STATE_CONNECTING = 16,
+    SHRPE_STATE_CONNECTED = 32
+  } shrpe_state_t;
+  typedef enum {
+    SHRPE_OK = 0,
+    SHRPE_ERR_UNDEFINED = -1,
+    SHRPE_ERR_TIMEOUT = -2,
+    SHRPE_ERR_STATE = -3,
+    SHRPE_ERR_CRC = -4,
+    SHRPE_ERR_LEN = -5,
+    SHRPE_ERR_SEND = -6,
+    // Etc
+  } shrpe_result_t;
+	typedef enum {
+		SHRPE_RESET_SHIELD = 1,
+		SHRPE_UPLOAD_OBJECT = 2,
+		SHRPE_GET_NEXT_MSG = 3,
+		SHRPE_GET_STATE = 5, 
+		SHRPE_SET_CONTACTS = 6
+	} shrpe_msg_t;
+	typedef enum {
+		SHRPE_RESET_EVENT = 1,
+		SHRPE_UPLOAD_OBJECT_ACK = 2,
+		SHRPE_DOWNLOAD_OBJECT = 4,
+		SHRPE_STATE_CHANGED = 5
+	} shrpe_event_t;
+}
+
+class Shrpe : public Stream
 {
-  private:
-	volatile bool dataAvailable;
-  public:
-	/*
-	  Constructor för a Shrpe object.
-	*/
+private:   
+    shrpe_state_t _state;
+		
+		/*
+     * Get the next message in shield
+     *
+     * return: shrpe_result if it was successful/error
+     */
+		shrpe_result_t getNextMessage(int* msg, size_t* length);
+		
+		
+public:
     Shrpe();
-	/*
-	  Initializes the Shrpe object and makes it ready for transmission of data.
-	*/
-	void begin();
-	/*
-	  Writes a single (unsigned) byte to the SHRPE Shield.
-	*/
-	int write(uint8_t data_byte, uint8_t msg_type);
-	/*
-	  Writes an array of (unsigned) bytes to the SHRPE Shield.
-	  The function is capable of sending between 1-40 bytes.
-	  @param	array	the data to be sent.
-	  @param	size	size of the array.
-	  @return			0 if write function was successful, -1 otherwise.
-	*/
-	int write(uint8_t array[], uint8_t size, uint8_t msg_type);
-	/*
-	  Receives an array of (unsigned) bytes from the SHRPE Shield.
-	  The function is capable of receiving up to 38 bytes.
-	  Returns the numbers of bytes in the array.
-	  @param	buffer_ptr	pointer to where to store the data.
-	  @param	size		size of the array.
-	  @return				the length of the array, 0 if CRC is wrong, -1 if error reading.
-	*/
-	int read(uint8_t* buffer_ptr, uint8_t size);
-	/*
-	  @Return	true if the shield has data available, otherwise false.
-	*/
-	boolean available();
+
+    /* 
+     * Initiate the shield
+		 * Reeturns the shield state after init phase.
+     */
+    int begin();
+
+    /* 
+     * Handle shield events
+     * Shall be called by app in loop-function
+     */
+    void loop();
+		
+    /*
+     * Get the shield state
+     *
+     * return: the state
+     */
+    shrpe_state_t getState() const
+      { return _state; }
+
+    /*
+     * Send an UploadObject message.
+     * The shield only supports one outgoing message at a time.
+     * It is possible to send in any state.
+     * If the message is not acknowledged the send is considered failed
+     * and the shield tries to re-connect automatically.
+     *
+     * param buffer: byte array that contains the data to send
+     * param size: number of bytes to send
+     *
+     * return: number of bytes written or SHRPE_ERR_TIMEOUT
+     */
+    int sendUploadObject(const uint8_t *buffer, size_t size);
+    
+    /*
+     * Receive an UploadObject acknowledgment.
+     *
+     * param buffer: byte array that will contain the received data after the call
+     * param length: the length of the array
+     *
+     * return: number of bytes received or error (<0)
+     */
+    int receiveUploadObjectAck(uint8_t *buffer, size_t length);
+    
+    /*
+     * Receive a DownloadObject message, if any pending
+     *
+     * param buffer: byte array that will contain the received data after the call
+     * param length: the length of the array
+     *
+     * return: number of bytes received or error (<0)
+     */
+    int receiveDownloadObject(uint8_t *buffer, size_t length);
+    
+    /*
+     * Set contacts
+     *
+     * param contacts: bit array containing 8 contacts
+     *
+     * return: result 
+     */
+    int setContacts(uint8_t contacts);
+		
+		/*
+     * Resets the shield.
+     *
+     * return: result 
+     */
+    int resetShield(void);
+    
+    /*
+     * Get shield information
+     */
+    //int getShieldInfo();
+
+    /* 
+     ***************************
+     * Standard stream interface
+     ***************************
+     */
+     
+    /*
+     * Check if a DownloadObject message is available
+     *
+     * return: number of bytes available, 0 if nothing
+     */
+    virtual int available();
+    /*
+     * Read next byte of a DownloadObject message, if available
+     * Use function readBytes read mnay bytes at a time
+     *
+     * return: next byte or -1 if no data is available
+     */
+    virtual int read();
+    /*
+     * Peek at next byte of a DownloadObject message, if available
+     *
+     * return: next byte or -1 if no data is available
+     */
+    virtual int peek();
+    /*
+     * Flush the rest of the DownloadObject message, if any
+     */
+    virtual void flush();
+    /*
+     * Write the next byte of an UploadObject message
+     *
+     * return: 1 if success, otherwise 0
+     */
+    virtual size_t write(const uint8_t byte);
+    /*
+     * Write the next bytes of an UploadObject message
+     *
+     * return: the number of bytes written, or 0 in case of error
+     */
+    virtual size_t write(const uint8_t *buffer, size_t size);
+    /*
+     * Flush the write buffer, that is, send the UploadObject message
+     *
+     * return: 0 if success or <0 in case of error
+     */
+    virtual int flushWriteBuffer();
+
 };
 
 #endif
-
